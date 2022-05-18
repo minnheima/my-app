@@ -5,12 +5,17 @@ class PhoneInfo extends Component {
     editing: false,
     name: '',
     phone: ''
-  }
-
+  };
+  shouldComponentUpdate(nextProps, nextState){
+    if(this.state !== nextState){
+      return true;
+    }
+    return this.props.info !== nextProps.info;
+  };
   handleRemove = ()=> {
     const { info, onRemove } = this.props;
     onRemove(info.id);
-  }
+  };
   handleToggleEdit = () => {
     // true 에서 false로
       // onUpdate
@@ -31,12 +36,12 @@ class PhoneInfo extends Component {
     this.setState({
       editing: !this.state.editing,
     })
-  }
+  };
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
     })
-  }
+  };
   render() {
     const { name, phone } = this.props.info;
     const { editing } = this.state;
@@ -45,7 +50,7 @@ class PhoneInfo extends Component {
       padding: '8px',
       margin: '8px',
     }
-
+    console.log(name);
     return (
       <div style={style}>
       { 

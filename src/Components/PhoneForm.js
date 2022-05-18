@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 
 class PhoneForm extends Component {
+  input = null
+
   state = {
     name: '',
     phone: '',
-  }
+  };
 
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
     });
-  }
+  };
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -18,8 +20,9 @@ class PhoneForm extends Component {
     this.setState({
       name: '',
       phone: '',
-    })
-  }
+    });
+    this.input.focus();
+  };
 
   render() {
     return (
@@ -28,7 +31,8 @@ class PhoneForm extends Component {
           name="name"
           placeholder="name" 
           onChange={this.handleChange} 
-          value={this.state.name} 
+          value={this.state.name}
+          ref={ref => this.input = ref}
         />
         <input 
           name="phone"
