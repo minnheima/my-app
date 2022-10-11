@@ -4,44 +4,59 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { legacy_createStore as createStore } from "redux";
 
-const add = document.getElementById("add");
-const minus = document.getElementById("minus");
-const number = document.querySelector("span");
-number.innerText = 0;
+const form = document.querySelector("form");
+const input = document.querySelector("input");
+const ul = document.querySelector("ul");
 
-//2nd imporvemnet )) 변수 상수를 이용해서 string값을 관리하면 오류를 줄일 수 있다
-const ADD = "ADD";
-const MINUS = "MINUS";
+const ADD_TODO = "ADD_TODO";
+const DELETE_TODO = "DELETE_TODO";
 
-//action은 redux에서 function을 부를 때 쓰는 두번째 parameter or argument다
-//1st improvement )) if else 보다 switch를 사용하는 것이 좋다
-const countModifier = (count = 0, action) => {
+const reducer = (state = [], action) => {
   switch (action.type) {
-    case ADD:
-      return count + 1;
-    case MINUS:
-      return count - 1;
+    case ADD_TODO:
+      return [...state, { text: action.text, id: Date.now() }];
+    case DELETE_TODO:
+      return state.filter((toDo) => toDo.id !== action.id);
     default:
-      return count;
+      return state;
   }
 };
 
-const countStore = createStore(countModifier);
+const store = createStore(reducer);
+store.subscribe(() => console.log(store.getState()));
 
-const onChange = () => {
-  number.innerText = countStore.getState();
+const paintTodos = () => {
+  const toDos = store.getState();
+  ul.innerHTML = ""; // ul안의 li값을 없애줌
+  toDos.forEach((toDo) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.innerText = "Del";
+    btn.addEventListener("click", deleteTodo);
+    li.id = toDo.id;
+    li.innerText = toDo.text;
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
 };
-//count value update
-countStore.subscribe(onChange);
+store.subscribe(paintTodos); //store가 바뀔때마다 repainting해서 계속 이전 값들도 보임 so! -> line29 ul.innerHTML = "";
 
-const handleAdd = () => {
-  countStore.dispatch({ type: ADD });
+const addTodo = (text) => {
+  store.dispatch({ type: ADD_TODO, text });
 };
-const handleMinus = () => {
-  countStore.dispatch({ type: MINUS });
-};
-add.addEventListener("click", handleAdd);
-minus.addEventListener("click", handleMinus);
 
+const deleteTodo = (e) => {
+  // console.log(e.target.parentNode.id);
+  const id = parseInt(e.target.parentNode.id);
+  store.dispatch({ type: DELETE_TODO, id });
+};
+const onSubmit = (e) => {
+  e.preventDefault();
+  const toDo = input.value;
+  input.value = "";
+  addTodo(toDo);
+};
+
+form.addEventListener("submit", onSubmit);
 // const root = ReactDOM.createRoot(document.getElementById("root"));
 // root.render(<App />);
